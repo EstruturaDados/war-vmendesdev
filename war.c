@@ -222,15 +222,71 @@ void exibirMapa(const Territorio *mapa, int quantidade) {
 
 // faseDeAtaque():
 // Gerencia a interface para a ação de ataque, solicitando ao jogador os territórios de origem e destino.
-// Chama a função simularAtaque() para executar a lógica da batalha.
 void faseDeAtaque(Territorio *mapa, int quantidade) {
-    printf("\nFuncao de ataque ainda sera implementada no nivel Aventureiro.\n");
+    int origem, destino;
+    printf("\n=== FASE DE ATAQUE ===\n");
+
+    // Lista os territórios
+    for (int i = 0; i < quantidade; i++) {
+        printf("%d - %s (Exercito: %s, Tropas: %d)\n",
+               i + 1, mapa[i].nome, mapa[i].corExercito, mapa[i].tropas);
+    }
+
+    printf("\nEscolha o territorio de origem (numero): ");
+    scanf("%d", &origem);
+    limparBufferEntrada();
+
+    printf("Escolha o territorio de destino (numero): ");
+    scanf("%d", &destino);
+    limparBufferEntrada();
+
+    // Ajuste de índices
+    origem--; destino--;
+
+    if (origem < 0 || origem >= quantidade || destino < 0 || destino >= quantidade) {
+        printf("\nTerritorio invalido!\n");
+        return;
+    }
+
+    if (origem == destino) {
+        printf("\nOrigem e destino sao iguais! Escolha territorios diferentes.\n");
+        return;
+    }
+
+    if (mapa[origem].tropas < 2) {
+        printf("\nTerritorio de origem nao possui tropas suficientes para atacar.\n");
+        return;
+    }
+
+// Chama a função simularAtaque() para executar a lógica da batalha.
+    simularAtaque(&mapa[origem], &mapa[destino]);
 }
 // simularAtaque():
 // Executa a lógica de uma batalha entre dois territórios.
+    void simularAtaque(Territorio *origem, Territorio *destino) {
+    int ataque, defesa;
+
+    printf("\nSimulando ataque de %s para %s...\n", origem->nome, destino->nome);
+
 // Realiza validações, rola os dados, compara os resultados e atualiza o número de tropas.
 // Se um território for conquistado, atualiza seu dono e move uma tropa.
+    ataque = rand() % origem->tropas + 1;  // pelo menos 1 tropa ataca
+    defesa = rand() % destino->tropas + 1; // pelo menos 1 tropa defende
 
+    printf("Tropas atacantes: %d | Tropas defensoras: %d\n", ataque, defesa);
+
+    if (ataque > defesa) {
+        printf("Ataque bem-sucedido! %s conquistado.\n", destino->nome);
+        destino->tropas -= defesa;
+        destino->tropas = (destino->tropas <= 0) ? 1 : destino->tropas;
+        strcpy(destino->corExercito, origem->corExercito);
+        origem->tropas -= 1; // perde uma tropa no ataque
+    } else {
+        printf("Ataque falhou! %s continua sob controle do exercito %s.\n",
+               destino->nome, destino->corExercito);
+        origem->tropas -= 1; // perde uma tropa no ataque
+    }
+}
 // sortearMissao():
 // Sorteia e retorna um ID de missão aleatório para o jogador.
 
